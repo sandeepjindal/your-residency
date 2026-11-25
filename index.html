@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,"/>
+<title>Tax Residency Calculator for Indians — Which PR Is Actually Worth It?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#f4f6f5; --panel2:#eef2f0; --ink:#13201e; --muted:#5a6b68; --line:#dde5e1;
+  --teal:#0f766e; --teal-dark:#0b3d39; --amber:#b45309; --amber-bg:#fef3c7; --red:#b91c1c; --red-bg:#fef2f2;
+  --green:#15803d; --green-bg:#f0fdf4; --gold:#92400e;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0f1716; --panel:#16211f; --panel2:#1a2825; --ink:#e8efed; --muted:#9db0ab; --line:#263734; --amber-bg:#451a03; --red-bg:#450a0a; --green-bg:#052e16; }
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Public Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+button,select,input{font:inherit;min-height:44px}
+a{color:var(--teal)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 56px}
+.hero{padding:36px 0 8px;border-bottom:3px solid var(--teal-dark)}
+@media(prefers-color-scheme:dark){.hero{border-color:var(--teal)}}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:var(--teal)}
+h1{font-size:clamp(32px,5vw,54px);line-height:.95;letter-spacing:-.03em;margin:10px 0 14px;font-weight:800}
+h1 em{font-style:normal;color:var(--teal)}
+.lede{font-size:18px;color:var(--muted);max-width:760px}
+.meta{font-size:13px;color:var(--muted);margin-top:12px}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:24px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.controls{background:var(--teal-dark);color:#fff;border-radius:16px;padding:22px;position:sticky;top:16px}
+@media(prefers-color-scheme:dark){.controls{background:#123f3a}}
+.controls h2{margin:0 0 4px;font-size:18px}
+.controls p{font-size:13px;opacity:.85;margin:0 0 18px}
+.field{margin-bottom:18px}
+.field label{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:6px}
+.field label output{font-family:"IBM Plex Mono",monospace;color:#5eead4}
+.field input[type=range]{width:100%;accent-color:#2dd4bf;min-height:28px}
+.field input[type=number],.field select{width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;padding:10px 12px}
+.field select option{color:#111}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:999px;padding:8px 6px;font-size:13px;font-weight:700;cursor:pointer;min-height:40px}
+.seg button.active{background:#fff;color:#0b3d39}
+.toggle{display:flex;gap:8px;align-items:flex-start;background:rgba(255,255,255,.08);padding:12px;border-radius:10px;font-size:13px}
+.toggle input{width:20px;height:20px;margin-top:2px;accent-color:#2dd4bf}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips label{font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:8px 11px;cursor:pointer;background:var(--bg);min-height:36px;display:inline-flex;align-items:center}
+.chips input{accent-color:var(--teal)}
+.results-head{display:flex;justify-content:space-between;gap:16px;align-items:end;flex-wrap:wrap}
+.results-head h2{font-size:26px;margin:0;letter-spacing:-.02em}
+.sortbar{display:flex;gap:6px;flex-wrap:wrap}
+.sortbar button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.sortbar button.active{background:var(--ink);color:var(--bg)}
+.verdict{background:var(--amber-bg);border:1px solid #f59e0b55;border-radius:14px;padding:16px 18px;margin:18px 0;font-size:14px}
+.verdict strong{color:var(--gold)}
+@media(prefers-color-scheme:dark){.verdict strong{color:#fbbf24}}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:700px){.cards{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--bg)}
+.card.top{border:2px solid var(--teal);background:var(--green-bg)}
+.card h3{margin:0;font-size:19px}
+.card h3 span{font-weight:400;color:var(--muted);font-size:14px}
+.rank{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-weight:700}
+.big{font-family:"IBM Plex Mono",monospace;font-size:28px;font-weight:600;letter-spacing:-.02em;margin:8px 0 2px}
+.sub{font-size:13px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;font-size:13px}
+.grid2 b{display:block;font-size:15px}
+.badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:999px}
+.badge.ok{background:var(--green-bg);color:var(--green);border:1px solid #22c55e44}
+.badge.no{background:var(--red-bg);color:var(--red);border:1px solid #ef444444}
+.badge.mid{background:var(--amber-bg);color:var(--amber);border:1px solid #f59e0b44}
+.bar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--teal)}
+section{margin-top:44px}
+section>h2{font-size:28px;letter-spacing:-.02em;margin:0 0 8px}
+section>p{color:var(--muted);max-width:780px}
+.stack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.stack-grid{grid-template-columns:1fr}}
+.stack{border:1px solid var(--line);border-radius:16px;padding:18px}
+.stack h3{margin:6px 0 8px}
+.timeline{margin:14px 0;padding:0;list-style:none}
+.timeline li{padding:10px 0 10px 18px;border-left:3px solid var(--teal);position:relative;font-size:14px}
+.timeline li b{font-family:"IBM Plex Mono",monospace}
+.warn{font-size:13px;background:var(--red-bg);border-radius:10px;padding:10px 12px;color:var(--red)}
+.table-wrap{overflow:hidden;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+td.num{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+@media(max-width:760px){
+  table,thead,tbody,tr,td{display:block;width:100%}
+  thead{display:none}
+  tr{padding:12px;border-bottom:2px solid var(--line)}
+  td{border:none;padding:4px 0}
+  td::before{content:attr(data-l);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+}
+details{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px;background:var(--panel)}
+summary{font-weight:700;cursor:pointer;min-height:36px}
+.small{font-size:13px;color:var(--muted)}
+footer{margin-top:48px;border-top:1px solid var(--line);padding-top:18px;font-size:13px;color:var(--muted)}
+.chart{background:var(--panel);border-radius:14px;padding:18px;margin-top:14px}
+.tabs{display:flex;gap:8px;margin:22px 0 4px;border-bottom:2px solid var(--line);padding-bottom:0;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);border-bottom:none;background:var(--panel);color:var(--ink);border-radius:12px 12px 0 0;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;min-height:48px}
+.tabs button.active{background:var(--teal-dark);color:#fff;border-color:var(--teal-dark)}
+@media(prefers-color-scheme:dark){.tabs button.active{background:var(--teal);border-color:var(--teal)}}
+.sip-layout{display:grid;grid-template-columns:340px 1fr;gap:24px;margin-top:24px;align-items:start}
+@media(max-width:900px){.sip-layout{grid-template-columns:1fr}}
+.sip-controls{background:#1a3a2e;color:#fff;border-radius:16px;padding:22px;position:sticky;top:16px}
+@media(prefers-color-scheme:dark){.sip-controls{background:#14332a}}
+.sip-controls h2{margin:0 0 4px;font-size:18px}
+.sip-controls p{font-size:13px;opacity:.85;margin:0 0 18px}
+.sip-controls .field label output{color:#6ee7b7}
+.sip-controls input[type=range]{accent-color:#34d399}
+.formula{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:18px;font-size:15px}
+.formula code{font-family:"IBM Plex Mono",monospace;font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:block;margin:10px 0;white-space:normal;word-break:break-word;line-height:1.6}
+.sip-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+@media(max-width:700px){.sip-stats{grid-template-columns:1fr}}
+.sip-stat{border:1px solid var(--line);border-radius:16px;padding:18px}
+.sip-stat.hero-stat{border:2px solid var(--teal);background:var(--green-bg)}
+.sip-stat .lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.sip-stat .val{font-family:"IBM Plex Mono",monospace;font-size:clamp(22px,3vw,30px);font-weight:600;margin:6px 0 2px}
+.splitbar{display:flex;height:28px;border-radius:999px;overflow:hidden;margin-top:10px;border:1px solid var(--line)}
+.splitbar .inv{background:var(--teal)}
+.splitbar .gain{background:#d97706}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.ybars{display:flex;align-items:flex-end;gap:4px;height:180px;margin-top:14px;border-bottom:2px solid var(--line);padding-top:8px}
+.ybar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-width:0}
+.ybar .seg-inv{background:var(--teal);width:100%}
+.ybar .seg-gain{background:#d97706;width:100%}
+.ybar-lbl{font-size:10px;text-align:center;color:var(--muted);margin-top:6px;font-family:"IBM Plex Mono",monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="kicker">For Indian citizens in tech • Nov 2026 research</div>
+  <h1>Which PR is <em>actually</em><br>worth the pay cut?</h1>
+  <p class="lede">A calculator built for one real profile — a 33-year-old Engineering Manager in London on ~£240k with a data-engineer spouse and a baby due Jan 2027 — then opened up so you can change age, net worth and strategy. It prices every route the same way: pay after tax &amp; childcare, years to PR and citizenship, whether your spouse can work, and what it costs you vs. staying in the UK.</p>
+  <p class="meta">Data: Levels.fyi medians, Numbeo childcare &amp; cost-of-living, official immigration guides — researched 23 Nov 2026. Tax figures are estimates from progressive structures (±3–5pp), not a personal tax calculation. Rules flagged ⚠️ changed in 2025–26 and are <strong>not yet law</strong> where stated. This is general information, not tax or immigration advice.</p>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Calculators">
+  <button role="tab" id="tabBtnRes" aria-selected="true" class="active">Tax Residency Calculator</button>
+  <button role="tab" id="tabBtnSip" aria-selected="false">SIP Calculator</button>
+</nav>
+
+<div id="panel-residency" role="tabpanel">
+<div class="layout">
+  <!-- CONTROLS -->
+  <aside class="controls" aria-label="Calculator controls">
+    <h2>Your situation</h2>
+    <p>Move these — every result below recalculates instantly.</p>
+
+    <div class="field"><label>Your age <output id="oAge">33</output></label><input type="range" id="age" min="25" max="55" value="33"></div>
+    <div class="field"><label>Net worth today <output id="oNW">£300k</output></label><input type="range" id="nw" min="0" max="2000000" step="10000" value="300000"></div>
+    <div class="field"><label>Plan horizon <output id="oHz">10 yrs</output></label><input type="range" id="hz" min="3" max="25" value="10"></div>
+    <div class="field"><label>Share of after-tax, after-childcare cash you save <output id="oSave">30%</output></label><input type="range" id="save" min="10" max="70" value="30"></div>
+
+    <div class="field"><label>Residency strategy</label>
+      <div class="seg" id="stratSeg">
+        <button data-v="single" class="active">Single</button>
+        <button data-v="dual">Dual stack</button>
+        <button data-v="triple">Triple</button>
+      </div>
+      <p style="margin:8px 0 0;font-size:12px;opacity:.85" id="stratNote">One country, done properly. Lowest compliance burden.</p>
+    </div>
+
+    <div class="field"><label>What matters most?</label>
+      <div class="seg" id="goalSeg">
+        <button data-v="money" class="active">💷 Money</button>
+        <button data-v="fast">🛂 Fastest PR</button>
+        <button data-v="family">👶 Family</button>
+      </div>
+    </div>
+
+    <label class="toggle"><input type="checkbox" id="spouseMust" checked><span><strong>Spouse must be able to work</strong><br>When on, the US on H-1B/H-4 and Singapore on a Dependant’s Pass are flagged as failing your hard requirement.</span></label>
+
+    <div class="field" style="margin-top:16px"><label>Tax-residency overlay (days test)</label>
+      <select id="overlay">
+        <option value="none">No overlay — PR route only</option>
+        <option value="thailand">+ Thailand tax residency (180 days/yr)</option>
+        <option value="india">+ India RNOR / NRI watch (120 / 182 days)</option>
+        <option value="both">+ Thailand + India watch</option>
+      </select>
+      <p style="font-size:12px;opacity:.85;margin:6px 0 0" id="overlayNote">PR and tax residency are different systems. You trigger tax residency by days, you earn PR by years.</p>
+    </div>
+  </aside>
+
+  <!-- RESULTS -->
+  <main>
+    <div class="results-head">
+      <div><h2 id="resultTitle">Ranked for money</h2><p class="small" style="margin:4px 0 0">Sorted by cash left each year after tax &amp; childcare, at the local EM median — not your London salary transplanted abroad.</p></div>
+      <div class="sortbar" id="sortBar">
+        <button data-s="money" class="active">Money</button><button data-s="pr">Fastest PR</button><button data-s="family">Family</button><button data-s="tax">Lowest tax</button>
+      </div>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+
+    <div class="chart">
+      <strong style="font-size:14px">Cash left per year after tax &amp; childcare (£)</strong>
+      <div id="chart" style="margin-top:12px"></div>
+      <p class="small" style="margin:8px 0 0">Bars use each city’s EM median TC from Levels.fyi (Nov 2026). London’s £240k current package is shown in the UK card — the median is lower (£171k), which is why staying can beat moving even before childcare.</p>
+    </div>
+
+    <div style="margin-top:20px">
+      <strong style="font-size:14px">Compare countries</strong>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="cards" id="cards"></div>
+
+    <section>
+      <h2>The hindsight table</h2>
+      <p>If you only look back in 10 years, this is the bit that will matter: what you gave up in pay, how long you were insecure, and whether the status survives leaving. “Keep PR” is the rule <em>after</em> grant — different from the absence rule to qualify.</p>
+      <div class="table-wrap"><table><thead><tr><th>Country</th><th>EM median (£)</th><th>After tax &amp; childcare /yr</th><th>PR</th><th>Citizenship</th><th>Keep PR</th><th>Spouse</th></tr></thead><tbody id="tbody"></tbody></table></div>
+      <p class="small">† Berlin/Stockholm childcare figures reflect subsidised public provision in the Numbeo sample, not a private-market price. ‡ No Levels.fyi city median — band estimate. § Toronto Numbeo childcare looks low vs. market reports; treat with caution. Keep-PR rules for Denmark, Ireland, Singapore, Spain &amp; Poland were not all verified against the primary source in the research — check GOV.UK / BAMF / Migrationsverket / SIRI / IRCC / ICA before relying on them.</p>
+    </section>
+  </main>
+</div>
+
+<section>
+  <h2>Stacking residencies — the part everyone gets wrong</h2>
+  <p>You don’t “apply” for multiple tax residencies, you trigger them by days — UK Statutory Residence Test (183 days, or fewer with ties), India (182 days, or 120–181 days if Indian income &gt; ₹15 lakh → RNOR), Thailand (180 days in a calendar year, Revenue Code s.41). PR stacking is the opposite problem: every PR has an absence clock, and the clocks fight each other. These three stacks are sequenced to respect the clocks in the research.</p>
+  <div class="stack-grid">
+    <div class="stack"><span class="badge ok">Most realistic dual</span><h3>UK ILR → Canada PR hedge</h3>
+      <ul class="timeline">
+        <li><b>Year 0</b> — Canada Express Entry: PR on arrival, ~6 months processing. The only PR in this set you don’t wait years for.</li>
+        <li><b>Years 0–5</b> — Live in the UK for ILR (≤180 days out in any rolling 12 months). ⚠️ UK Earned Settlement would move this to 10 years, or 3 years at ≥£125,141 — announced 2 Nov 2026, not yet law.</li>
+        <li><b>By Year 5</b> — You are <span id="ageStack1">38</span> at UK ILR. Canada needs 730 days in Canada in every 5 years — you must bank Canada days <em>before or after</em> the UK block, not during it.</li>
+      </ul>
+      <p class="warn">Conflict: UK ILR lapses after 2 years away; Canada lapses if you miss 730 days in 5. You cannot “park” both indefinitely — you have to keep returning to one of them.</p>
+    </div>
+    <div class="stack"><span class="badge ok">Fastest in Europe</span><h3>Germany Blue Card → EU long-term</h3>
+      <ul class="timeline">
+        <li><b>Month 21–27</b> — Niederlassungserlaubnis with B1 German (21 mo) or A1 (27 mo; some sources say 33 mo without language — verify with BAMF).</li>
+        <li><b>Year 5</b> — German citizenship, dual citizenship now allowed (since 27 Jun 2024). The 3-year fast-track was repealed 30 Oct 2025.</li>
+        <li><b>Then</b> — As an EU citizen you can live/work anywhere in the EU — this is the “UK ILR + Europe” idea, done via citizenship, not by holding two PRs at once.</li>
+      </ul>
+      <p class="warn">German settlement lapses after ~6 months abroad unless a longer absence is approved in advance. Don’t leave for a year and assume it’s waiting.</p>
+    </div>
+    <div class="stack"><span class="badge mid">High pay, high risk</span><h3>US pay spike → return with capital</h3>
+      <ul class="timeline">
+        <li><b>SF median $480k (~£358k), Meta $840k (~£627k)</b> — Seattle $460k with no state income tax beats SF after tax.</li>
+        <li><b>Spouse:</b> H-4 cannot work by default. Only L-1/L-2 (spouse works incident to status) or EB-1 fixes this.</li>
+        <li><b>Green card:</b> EB-2 India final action date 1 Nov 2013 (Nov 2026 Visa Bulletin); ~179-year NFAP estimate for a Jan 2026 EB-2 filing.</li>
+      </ul>
+      <p class="warn">Verdict in hindsight: the US only makes financial sense as a 3–5 year earnings spike on L-1A/EB-1 — not as a settlement plan for an Indian citizen on H-1B.</p>
+    </div>
+  </div>
+  <div id="overlayBox" style="margin-top:14px"></div>
+</section>
+
+<section>
+  <h2>What the research actually recommends</h2>
+  <div class="stack-grid">
+    <div class="stack"><h3>🏆 Stay — if £240k holds</h3><p class="small">Stay in London if Meta keeps you at ~£240k+ and the Earned Settlement 3-year route for ≥£125k earners survives. It preserves both incomes, English schooling, and the fastest realistic settlement for <em>this</em> family. London nursery is ~£2,120/mo (Numbeo $2,844) — the cost you pay for not taking a 40–50% pay cut.</p></div>
+    <div class="stack"><h3>🇩🇪 Best all-round move — Berlin</h3><p class="small">Near-free Kita, married tax splitting (<em>Ehegattensplitting</em>), Kindergeld €255/mo/child (2025), 12–14 months Elterngeld, 5-year citizenship with dual nationality, fastest PR in Europe. The price is a ~40–50% gross cut vs. £240k and learning German to B1.</p></div>
+    <div class="stack"><h3>🇨🇦 Best long-term hedge — Toronto</h3><p class="small">Express Entry PR on arrival, citizenship after 1,095 days in 5 years, Cost of Living Index 67.5 vs. London 87.5, spouse open work permit (TEER 0/1 since 21 Jan 2025). EM median CA$228k (~£121k) is roughly half London — you are buying security, not pay.</p></div>
+  </div>
+  <p style="margin-top:14px"><strong>Do not move to the US on H-1B or to Singapore on an EP if your wife working in tech is a hard requirement</strong> — the research shortlist is explicit on this. Singapore tax is the lowest here (~12–15% effective, no capital gains tax) but a Dependant’s Pass holder may not work on that pass (Letter of Consent withdrawn 1 May 2021) and foreign children mostly need international school at SGD 35,000–55,000/yr/child, which eats the tax saving.</p>
+</section>
+
+<section>
+  <h2>How the calculator works — and what it leaves out</h2>
+  <details open><summary>Formula (tap to collapse)</summary>
+    <p class="small">For each city: <strong>Cash left = EM median TC (£) × (1 − effective tax) − annual childcare</strong>. Projected net worth = your net worth today + (cash left × your savings share × horizon years). It does <em>not</em> compound investment returns, model rent (use the Cost of Living Index in each card as your guide — Zurich 118.5, Singapore 87.7, London 87.5, Toronto 67.5), model a second salary, or model RSU-by-country tax treatment. Married splitting (Germany), the Dutch 30% ruling (30% tax-free for up to 5 years, dropping to 27% from Jan 2027) and Spain’s Beckham Law (24% flat for 6 years) all move the real figure materially — they are noted on the cards, not baked into one false-precision number.</p>
+  </details>
+  <details><summary>India, Thailand &amp; the UK at the same time?</summary>
+    <p class="small">You cannot do 183 (UK) + 182 (India) + 180 (Thailand) = 545 days in one year. Triple <em>tax</em> residency only happens via low-day routes and different year-ends (UK Apr–Apr, India Apr–Mar, Thailand Jan–Dec) — e.g. 180 days Thailand + 120 days India (with Indian income &gt;₹15 lakh) + ~65 days UK with enough SRT ties. Shields matter more than residency itself: UK FIG regime (first 4 years), India RNOR (foreign income sheltered), Thailand LTR exemption on remitted foreign income (Royal Decree; otherwise foreign income earned from 2024 is taxable when remitted, Por.161/2566 — pre-2024 income stays exempt, Por.162/2566). Without a shield, triple residency is triple filing with foreign tax credits, plus tie-breakers under the UK–India, UK–Thailand and India–Thailand treaties.</p>
+  </details>
+  <details><summary>What changed in 2025–26 — don’t plan on yesterday’s rules</summary>
+    <p class="small">UK Earned Settlement 5→10 yrs (not yet law) • Germany 3-yr citizenship repealed Oct 2025 • Netherlands 30%→27% Jan 2027, citizenship 5→10 yrs proposed • Sweden citizenship 5→8 yrs in force 6 Jun 2026 • Ireland Stamp 1G spouse rights extended 15 May 2024 • US $100k H-1B fee vacated Jun 2026, $103,265 proposed Aug 2026; H-4 EAD auto-extension scrapped 30 Oct 2025 • Canada spousal open work permit narrowed Jan 2025, targets cut in 2026–28 Levels Plan.</p>
+  </details>
+</section>
+
+</div><!-- /panel-residency -->
+
+<div id="panel-sip" role="tabpanel" hidden>
+  <div style="margin-top:24px;max-width:820px">
+    <div class="kicker">Systematic Investment Plan • India</div>
+    <h2 style="font-size:clamp(28px,4vw,40px);line-height:1.05;letter-spacing:-.02em;margin:8px 0 10px">SIP Calculator</h2>
+    <p class="lede" style="font-size:17px">What does a monthly SIP actually grow to? Set the amount, return and years — with an optional annual step-up — and see the future value, what you put in, and what compounding added. Year by year, no black box.</p>
+  </div>
+
+  <div class="formula">
+    <strong>The formula used — exactly as specified</strong>
+    <code>Future Value = P × ({[1 + r]^n – 1} / r) × (1 + r)</code>
+    <p class="small" style="margin:6px 0 0"><strong>P</strong> = monthly SIP amount &nbsp;•&nbsp; <strong>r</strong> = monthly rate = annual return % ÷ 12 ÷ 100 &nbsp;•&nbsp; <strong>n</strong> = total number of months = years × 12. The final × (1 + r) is the annuity-due adjustment — it assumes each instalment is paid at the <em>start</em> of the month. With a step-up above 0%, the same formula is applied year by year with that year’s higher P and the results are compounded together, which is why the table below is calculated month by month.</p>
+    <p class="small" style="margin:8px 0 0"><strong>Estimate, not a guarantee:</strong> this assumes a smooth, constant return every month. Real mutual-fund returns vary year to year, and this does not include expense ratio, exit load, taxes (e.g. equity LTCG/STCG), or inflation. Use it to compare amounts, durations and step-ups — not as a promise of what a fund will deliver.</p>
+  </div>
+
+  <div class="sip-layout">
+    <aside class="sip-controls" aria-label="SIP controls">
+      <h2>Your SIP</h2>
+      <p>Move these — the results, chart and table recalculate instantly.</p>
+      <div class="field"><label>Monthly SIP amount (₹) <output id="oSipAmt">₹25,000</output></label><input type="range" id="sipAmt" min="500" max="200000" step="500" value="25000"><input type="number" id="sipAmtNum" value="25000" min="100" step="100" aria-label="Monthly SIP amount in rupees"></div>
+      <div class="field"><label>Expected annual return <output id="oSipRet">12%</output></label><input type="range" id="sipRet" min="1" max="20" step="0.5" value="12"></div>
+      <div class="field"><label>Investment duration <output id="oSipYrs">15 yrs</output></label><input type="range" id="sipYrs" min="1" max="40" step="1" value="15"></div>
+      <div class="field"><label>Annual step-up (optional) <output id="oSipStep">0%</output></label><input type="range" id="sipStep" min="0" max="25" step="1" value="0"><p style="font-size:12px;opacity:.85;margin:6px 0 0">Your monthly amount rises by this % every year — e.g. 10% step-up on ₹25,000 means ₹27,500/month in Year 2. Default is 0% (flat SIP).</p></div>
+      <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:12px;font-size:13px" id="sipQuick"></div>
+    </aside>
+
+    <main>
+      <div class="sip-stats">
+        <div class="sip-stat"><div class="lbl">Total invested</div><div class="val" id="sipInvested">—</div><div class="sub" id="sipInvestedSub"></div></div>
+        <div class="sip-stat"><div class="lbl">Estimated gains</div><div class="val" id="sipGains" style="color:#d97706">—</div><div class="sub" id="sipGainsSub"></div></div>
+        <div class="sip-stat hero-stat"><div class="lbl">Future value</div><div class="val" id="sipFV">—</div><div class="sub" id="sipFVSub"></div></div>
+      </div>
+
+      <div class="chart">
+        <strong style="font-size:14px">Invested vs. gains — what makes up the final value</strong>
+        <div class="splitbar"><div class="inv" id="splitInv"></div><div class="gain" id="splitGain"></div></div>
+        <div class="legend"><span><i style="background:var(--teal)"></i><span id="legInv">Invested</span></span><span><i style="background:#d97706"></i><span id="legGain">Gains</span></span></div>
+        <strong style="font-size:14px;display:block;margin-top:22px">Growth by year — invested (teal) stacked with gains (amber)</strong>
+        <div class="ybars" id="sipBars"></div>
+        <div style="display:flex;gap:4px" id="sipBarLbls"></div>
+        <p class="small" style="margin:10px 0 0">Each column is the portfolio value at that year-end. The longer the duration, the more of the column is amber — gains compounding on gains, not just your contributions.</p>
+      </div>
+
+      <section style="margin-top:28px">
+        <h2 style="font-size:22px">Year-by-year growth</h2>
+        <div class="table-wrap"><table><thead><tr><th>Year</th><th>Monthly SIP</th><th>Invested in year</th><th>Total invested</th><th>Value at year-end</th><th>Gains so far</th></tr></thead><tbody id="sipTbody"></tbody></table></div>
+        <p class="small">Values are rounded to the nearest rupee. With a 0% step-up, the final row’s future value matches the closed-form formula above; with a step-up, each year uses that year’s stepped-up monthly amount.</p>
+      </section>
+    </main>
+  </div>
+</div><!-- /panel-sip -->
+
+<footer>
+  <p><strong>Sources (from the research report, 23 Nov 2026):</strong> Levels.fyi city &amp; company medians (London, Berlin, Zurich, Amsterdam, Dublin, Singapore, Toronto, SF Bay Area, Seattle, Bengaluru, Spotify Stockholm) • Numbeo childcare &amp; Cost of Living Index 2026 • GOV.UK / Legal500 (UK dependant rights), BAMF via Starting in Germany (Blue Card &amp; citizenship), MRCI (Ireland Stamp 1G, May 2024), IRCC (Canada PR obligation &amp; 730-day rule), Sterling Law &amp; Parliament (UK Earned Settlement). Full links are in the research report. FX used in the report: £1 = $1.34, €1 ≈ £0.88, CHF1 ≈ £0.93, CA$1 ≈ £0.53, SG$1 ≈ £0.58.</p>
+  <p>Built as a snapshot on 25 Nov 2026. Immigration and tax rules in every country here are moving — verify PR-keeping absence rules and any 2025–26 change against the primary official source before you act, and take cross-border advice for an RSU + FIG + overseas-workday case.</p>
+</footer>
+</div>
+
+<script>
+var C=[
+{id:"uk",name:"United Kingdom",city:"London",gross:171000,tax:.39,child:2120*12,spouse:true,spouseLabel:"Yes — unrestricted",pr:5,prLabel:"5 yrs (→10 proposed; 3 if ≥£125k)",cit:6,citLabel:"6 yrs total",keep:"Lapses after 2 yrs away",col:"87.5",note:"Your base. Meta median £404k; your ~£240k sits above the £171k city median. IHS £1,035/yr/adult. ⚠️ Earned Settlement not yet law.",family:3},
+{id:"de",name:"Germany",city:"Berlin",gross:117000,tax:.40,child:104*12,spouse:true,spouseLabel:"Yes — unrestricted, no German needed",pr:2.25,prLabel:"21 mo (B1) – 27 mo (A1)",cit:5,citLabel:"5 yrs, dual allowed",keep:"~6 mo abroad lapses*",col:"Well below London",note:"Best value for a dual-income family: largely free Kita in Berlin, Ehegattensplitting, Elterngeld 12–14 mo, Kindergeld €255/mo.",family:5},
+{id:"ie",name:"Ireland",city:"Dublin",gross:163000,tax:.40,child:915*12,spouse:true,spouseLabel:"Yes — Stamp 1G, any employer",pr:2,prLabel:"~2 yrs to Stamp 4",cit:5,citLabel:"5 yrs reckonable",keep:"Stamp 4 renews 2-yearly*",col:"Housing ≈ London",note:"Highest EU EM median after Zurich/London (€185k). English-speaking. Dublin housing shortage is the pain point.",family:4},
+{id:"nl",name:"Netherlands",city:"Amsterdam",gross:128000,tax:.315,child:1975*12,spouse:true,spouseLabel:"Yes — labour freely permitted",pr:5,prLabel:"5 yrs",cit:5,citLabel:"5 yrs (10 proposed)",keep:"6 mo consecutive breaks it",col:"High — housing shortage",note:"With 30% ruling tax is ~30–33%; without it ~38–42%. Ruling drops to 27% from Jan 2027. Childcare allowance offsets much of the € cost. Citizenship normally needs renunciation — India does not allow dual citizenship.",family:4},
+{id:"ch",name:"Switzerland",city:"Zurich",gross:210000,tax:.275,child:2495*12,spouse:true,spouseLabel:"Yes (B permit) — small market",pr:10,prLabel:"10 yrs (5 early, discretionary)",cit:10,citLabel:"10 yrs + C permit",keep:"Lapses >6 mo (maint. max 4 yrs)",col:"118.5 — highest here",note:"Highest European pay & lowest European effective tax (~25–30%) — eaten by the most expensive childcare here ($3,344/mo) + rent + health insurance CHF 300–400/mo/adult.",family:3},
+{id:"se",name:"Sweden",city:"Stockholm",gross:90000,tax:.465,child:130*12,spouse:true,spouseLabel:"Yes — automatic with permit",pr:4,prLabel:"4 yrs",cit:8,citLabel:"5 → 8 yrs (Jun 2026 law)",keep:"~2 yrs absence*",col:"Moderate (Nordics)",note:"Best for a child: 480 days parental benefit, childcare capped ~SEK 1,500–1,700/mo. Pay is roughly half London in £. ⚠️ Citizenship is now 8 years.",family:5},
+{id:"dk",name:"Denmark",city:"Copenhagen",gross:106000,tax:.475,child:750*12,spouse:true,spouseLabel:"Yes — unrestricted",pr:8,prLabel:"8 yrs (4 exceptional)",cit:9,citLabel:"9 yrs",keep:"Not verified*",col:"Expensive",note:"24 weeks leave per parent, excellent for children — but top marginal tax 60.5% and the longest settlement road here. Pay is a band estimate‡.",family:5},
+{id:"ca",name:"Canada",city:"Toronto",gross:121000,tax:.40,child:295*12,spouse:true,spouseLabel:"Yes — open WP / PR on arrival",pr:0,prLabel:"0 — PR on arrival (Express Entry)",cit:3,citLabel:"3 yrs as PR (1,095 days)",keep:"730 days in every 5 yrs",col:"67.5",note:"Cleanest PR in the set (~6 mo processing). $10-a-day childcare rollout (waitlists long; Numbeo figure § is low). Winters are the cost.",family:4},
+{id:"us-sf",name:"United States",city:"SF Bay Area",gross:358000,tax:.375,child:3000*12,spouse:false,spouseLabel:"No on H-4 — Yes on L-2",pr:99,prLabel:"EB-2 India: decades (~179-yr est.)",cit:99,citLabel:"5 yrs after green card",keep:">6 mo risks GC; >1 yr abandons",col:"Very high (housing)",note:"Median $480k, Meta $840k (~£627k). No federal paid leave. Only L-1A / EB-1 makes this a settlement plan.",family:2},
+{id:"us-sea",name:"United States",city:"Seattle",gross:343000,tax:.315,child:2750*12,spouse:false,spouseLabel:"No on H-4 — Yes on L-2",pr:99,prLabel:"EB-2 India: decades (~179-yr est.)",cit:99,citLabel:"5 yrs after green card",keep:">6 mo risks GC; >1 yr abandons",col:"High (housing)",note:"Median $460k, Meta $710k. No state income tax — materially better after tax than SF at the same pay.",family:2},
+{id:"sg",name:"Singapore",city:"Singapore",gross:140000,tax:.135,child:1380*12,spouse:false,spouseLabel:"No on DP — needs own EP",pr:3,prLabel:"2–4 yrs, selective (10–30% est.)",cit:5,citLabel:"2 yrs as PR + renounce Indian",keep:"Re-Entry Permit needed*",col:"87.7",note:"Lowest tax here, no CGT — offset by international school SGD 35–55k/yr/child and insecure PR. Meta SGD 551k (~£320k) beats London; the median does not.",family:3},
+{id:"in",name:"India",city:"Bengaluru",gross:90000,tax:.265,child:300*12,spouse:true,spouseLabel:"Yes — citizens",pr:0,prLabel:"N/A — citizens",cit:0,citLabel:"N/A — citizens",keep:"N/A",col:"Fraction of London",note:"Highest savings rate here (family support, cheap help) — 60%+ nominal pay cut vs £240k, worst air quality in the set. Google ₹2.25 Cr (~£207k) is the top.",family:3},
+{id:"es",name:"Spain",city:"Madrid / Barcelona",gross:75000,tax:.27,child:616*12,spouse:true,spouseLabel:"Yes — Blue Card family",pr:5,prLabel:"5 yrs long-term",cit:10,citLabel:"10 yrs for Indians",keep:"Not verified*",col:"Well below London",note:"Best lifestyle per £: 19 weeks paternity (longest for fathers), Beckham Law 24% flat for 6 years. Pay is a band estimate‡ — a 60–70% cut vs £240k.",family:4},
+{id:"pl",name:"Poland",city:"Warsaw",gross:70000,tax:.275,child:528*12,spouse:true,spouseLabel:"Yes — family reunification",pr:5,prLabel:"5 yrs",cit:8,citLabel:"~8 yrs (not verified)",keep:"Not verified*",col:"Among cheapest here",note:"52 weeks shared parental leave, affordable family life. Pay is a band estimate‡ — a 65–75% cut vs £240k. Polish (B1) needed for citizenship.",family:4}
+];
+var selected={}; C.forEach(function(c){selected[c.id]=true});
+function g(id){return document.getElementById(id)}
+function fmt(n){if(n>=1000000)return "£"+(n/1000000).toFixed(2)+"m"; if(n>=1000)return "£"+Math.round(n/1000)+"k"; return "£"+Math.round(n)}
+function cash(c){return c.gross*(1-c.tax)-c.child}
+function render(){
+  var age=+g("age").value, nw=+g("nw").value, hz=+g("hz").value, sv=+g("save").value/100, must=g("spouseMust").checked;
+  g("oAge").textContent=age; g("oNW").textContent=fmt(nw); g("oHz").textContent=hz+" yrs"; g("oSave").textContent=g("save").value+"%";
+  g("ageStack1").textContent=age+5;
+  var goal=document.querySelector("#goalSeg button.active").dataset.v;
+  var sort=document.querySelector("#sortBar button.active").dataset.s;
+  g("resultTitle").textContent = goal==="money"?"Ranked for money":goal==="fast"?"Ranked for fastest security":"Ranked for family life";
+  var list=C.filter(function(c){return selected[c.id]});
+  var sorted=list.slice().sort(function(a,b){
+    if(sort==="money")return cash(b)-cash(a);
+    if(sort==="pr")return a.pr-b.pr;
+    if(sort==="tax")return a.tax-b.tax;
+    return (b.family-cash(b)/200000)-(a.family-cash(a)/200000);
+  });
+  // chart
+  var max=Math.max.apply(null,sorted.map(cash).concat([1]));
+  g("chart").innerHTML=sorted.map(function(c){var v=cash(c);return '<div style="display:grid;grid-template-columns:130px 1fr 64px;gap:10px;align-items:center;margin-bottom:7px;font-size:12px"><span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.city+'</span><span class="bar" style="margin:0"><i style="width:'+Math.max(2,v/max*100)+'%"></i></span><span style="font-family:IBM Plex Mono,monospace;text-align:right">'+fmt(v)+'</span></div>'}).join("");
+  // verdict
+  var best=sorted[0];
+  var uk=C[0];
+  var diff=cash(best)-cash(uk);
+  var vsText = "";
+  if(best.id==="uk"){ vsText = "the benchmark itself"; } else if(diff>=0){ vsText = fmt(diff)+" more than London at the median"; } else { vsText = fmt(-diff)+" less than London at the median"; }
+  var prAgeText = "";
+  if(best.pr>=99){ prAgeText = "no realistic PR age - see card"; } else { prAgeText = (age+best.pr)+" at PR"; }
+  var londonYours = fmt(240000*(1-0.39)-25440);
+  g("verdict").innerHTML="<strong>Hindsight verdict at your settings:</strong> On median pay, <b>"+best.city+" ("+best.name+")</b> leaves you <b>"+fmt(cash(best))+"/yr</b> after tax &amp; childcare - "+vsText+" - and you would be <b>"+prAgeText+"</b>. London at <em>your</em> £240k (not the £171k median) leaves ~"+londonYours+"/yr - essentially tied with Zurich at its median (£122k/yr) and ahead of every other European median here, before Zurich's higher rent (index 118.5 vs London 87.5). That gap - your package vs. the local median - is the single biggest number in this whole decision."+(must?" <b>Spouse-work filter is ON:</b> US (H-4) and Singapore (DP) fail it.":"");
+  // cards
+  g("cards").innerHTML=sorted.map(function(c,i){
+    var v=cash(c); var proj=nw+v*sv*hz; var fails=must&&!c.spouse;
+    return '<article class="card'+(i===0?" top":"")+'"><div class="rank">'+(i===0?"★ Best on this sort":"#"+(i+1))+" • "+c.city+'</div><h3>'+c.name+' <span>• EM median '+fmt(c.gross)+'</span></h3>'
+    +'<div class="big">'+fmt(v)+'<span style="font-size:14px;color:var(--muted)"> /yr left</span></div><div class="sub">after '+(c.tax*100).toFixed(1)+'% effective tax &amp; '+fmt(c.child)+'/yr childcare</div>'
+    +'<div class="bar"><i style="width:'+Math.max(3,v/max*100)+'%"></i></div>'
+    +'<div class="grid2"><div><span class="small">PR</span><b>'+c.prLabel+'</b><span class="small">Age '+(c.pr>=99?"—":(age+c.pr))+' • Keep: '+c.keep+'</span></div>'
+    +'<div><span class="small">Citizenship</span><b>'+c.citLabel+'</b><span class="small">Cost of living: '+c.col+'</span></div>'
+    +'<div><span class="small">Spouse work</span><br><span class="badge '+(c.spouse?"ok":"no")+'">'+c.spouseLabel+'</span>'+(fails?'<div style="color:var(--red);font-size:12px;font-weight:700;margin-top:4px">Fails your hard requirement</div>':"")+'</div>'
+    +'<div><span class="small">Net worth in '+hz+' yrs*</span><b>'+fmt(proj)+'</b><span class="small">vs. '+fmt(nw)+' today (saving '+(sv*100)+'% of cash left)</span></div></div>'
+    +'<p class="small" style="margin:12px 0 0">'+c.note+'</p></article>'}).join("");
+  // table
+  g("tbody").innerHTML=C.map(function(c){return '<tr><td data-l="Country"><b>'+c.name+'</b><br><span class="small">'+c.city+'</span></td><td data-l="Median" class="num">'+fmt(c.gross)+'</td><td data-l="After tax & childcare" class="num">'+fmt(cash(c))+'</td><td data-l="PR">'+c.prLabel+'</td><td data-l="Citizenship">'+c.citLabel+'</td><td data-l="Keep PR">'+c.keep+'</td><td data-l="Spouse">'+c.spouseLabel+'</td></tr>'}).join("");
+  // overlay
+  var ov=g("overlay").value; var box="";
+  if(ov==="thailand")box='<div class="verdict"><strong>Thailand overlay:</strong> 180 days in a calendar year makes you Thai tax resident (s.41) regardless of visa. Foreign income is taxed only when remitted — and since 1 Jan 2024, income earned while resident is taxable whenever remitted (Por.161/2566). LTR holders are exempt on remitted foreign income by Royal Decree. Tax residency gives you <b>no right to stay</b> — you still need a DTV / LTR / Elite / retirement visa for 180 days.</div>';
+  if(ov==="india")box='<div class="verdict"><strong>India overlay:</strong> Resident at 182+ days, or 120–181 days if Indian income (excl. foreign) &gt; ₹15 lakh → RNOR (foreign income sheltered). Under ₹15 lakh, the 182-day test alone applies — at ~137–144 days you stay NRI, taxed only on India-source income. Deemed-resident rule: Indian citizen with Indian income &gt;₹15 lakh liable to tax nowhere else can be deemed resident at zero days. FEMA status is separate.</div>';
+  if(ov==="both")box='<div class="verdict"><strong>Thailand + India overlay:</strong> Budget your days across three different year-ends (UK Apr–Apr, India Apr–Mar, Thailand Jan–Dec). 180 Thailand + 120 India + ~65 UK-with-ties can trigger all three tax residencies in one 12-month stretch — then you file in all three and rely on treaty tie-breakers (permanent home → centre of vital interests → habitual abode → nationality) and foreign tax credits. Keep a day-count diary; it is the only evidence that matters.</div>';
+  g("overlayBox").innerHTML=box;
+}
+// chips
+g("chips").innerHTML=C.map(function(c){return '<label><input type="checkbox" data-id="'+c.id+'" checked> '+c.city+'</label>'}).join("");
+g("chips").addEventListener("change",function(e){selected[e.target.dataset.id]=e.target.checked;render()});
+["age","nw","hz","save","spouseMust","overlay"].forEach(function(id){g(id).addEventListener("input",render);g(id).addEventListener("change",render)});
+function seg(id,cb){document.querySelectorAll("#"+id+" button").forEach(function(b){b.addEventListener("click",function(){document.querySelectorAll("#"+id+" button").forEach(function(x){x.classList.remove("active")});b.classList.add("active");if(cb)cb(b.dataset.v);render()})})}
+seg("sortBar"); seg("goalSeg");
+seg("stratSeg",function(v){g("stratNote").textContent=v==="single"?"One country, done properly. Lowest compliance burden.":v==="dual"?"Two statuses, sequenced around absence clocks. See the stacks below — never held passively at the same time.":"Three tax residencies are possible only via low-day routes (see FAQ). Three PRs at once is not — the absence clocks cancel each other."});
+render();
+
+/* ---------- Tabs ---------- */
+function showTab(which){
+  var isSip = which==="sip";
+  g("panel-residency").hidden = isSip;
+  g("panel-sip").hidden = !isSip;
+  g("tabBtnRes").classList.toggle("active", !isSip);
+  g("tabBtnSip").classList.toggle("active", isSip);
+  g("tabBtnRes").setAttribute("aria-selected", String(!isSip));
+  g("tabBtnSip").setAttribute("aria-selected", String(isSip));
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+g("tabBtnRes").addEventListener("click", function(){ showTab("res"); });
+g("tabBtnSip").addEventListener("click", function(){ showTab("sip"); });
+
+/* ---------- SIP Calculator ----------
+   FV = P x ({[1+r]^n - 1} / r) x (1+r),  r = annual%/12/100, n = years*12.
+   Computed month-by-month with the instalment at the START of each month
+   (balance = (balance + P) x (1+r)), which is algebraically identical to
+   the formula at 0% step-up. With step-up, P rises each year. */
+function fmtINR(n){
+  n = Math.round(n);
+  if(n>=10000000) return "₹"+(n/10000000).toFixed(2)+" Cr";
+  if(n>=100000) return "₹"+(n/100000).toFixed(2)+" L";
+  return "₹"+n.toLocaleString("en-IN");
+}
+function fmtINRfull(n){ return "₹"+Math.round(n).toLocaleString("en-IN"); }
+function sipCalc(){
+  var P0 = Math.max(0, +g("sipAmtNum").value || +g("sipAmt").value || 0);
+  var annual = +g("sipRet").value || 0;
+  var years = Math.max(1, +g("sipYrs").value || 1);
+  var step = (+g("sipStep").value || 0) / 100;
+  var r = annual / 12 / 100;
+  var n = years * 12;
+  g("oSipAmt").textContent = fmtINRfull(P0);
+  g("oSipRet").textContent = annual + "%";
+  g("oSipYrs").textContent = years + " yrs";
+  g("oSipStep").textContent = g("sipStep").value + "%";
+  if(document.activeElement !== g("sipAmtNum")) g("sipAmtNum").value = P0;
+
+  var balance = 0, invested = 0, rows = [];
+  for(var y=1; y<=years; y++){
+    var monthly = P0 * Math.pow(1+step, y-1);
+    var yearInvested = 0;
+    for(var m=0; m<12; m++){
+      balance = (balance + monthly) * (1 + r);
+      invested += monthly; yearInvested += monthly;
+    }
+    rows.push({year:y, monthly:monthly, yearInv:yearInvested, cumInv:invested, value:balance, gains:balance-invested});
+  }
+  var fv = balance, gains = fv - invested;
+  /* Cross-check at 0% step-up against the closed-form formula */
+  var closed = (r>0 && step===0) ? P0 * ((Math.pow(1+r, n)-1)/r) * (1+r) : null;
+
+  g("sipInvested").textContent = fmtINR(invested);
+  g("sipInvestedSub").textContent = fmtINRfull(invested) + " over " + n + " instalments";
+  g("sipGains").textContent = fmtINR(gains);
+  g("sipGainsSub").textContent = fmtINRfull(gains) + (invested>0 ? " — " + (gains/invested*100).toFixed(0) + "% on top of what you put in" : "");
+  g("sipFV").textContent = fmtINR(fv);
+  g("sipFVSub").textContent = fmtINRfull(fv) + " after " + years + " years at " + annual + "% p.a. (estimate)";
+  var invPct = fv>0 ? invested/fv*100 : 100;
+  g("splitInv").style.width = invPct + "%";
+  g("splitGain").style.width = (100-invPct) + "%";
+  g("legInv").textContent = "Invested " + fmtINR(invested) + " (" + invPct.toFixed(0) + "%)";
+  g("legGain").textContent = "Gains " + fmtINR(gains) + " (" + (100-invPct).toFixed(0) + "%)";
+  g("sipQuick").innerHTML = "<strong>At a glance:</strong> r = " + annual + "% ÷ 12 ÷ 100 = <b>" + (r*100).toFixed(3) + "%/month</b>, n = <b>" + n + " months</b>" + (step>0 ? ", monthly SIP grows " + g("sipStep").value + "%/yr to <b>" + fmtINRfull(rows[rows.length-1].monthly) + "</b> in Year " + years : "") + (closed!==null ? ". Formula check: closed-form FV = <b>" + fmtINRfull(closed) + "</b> ✓ matches the table." : ".");
+
+  var maxV = Math.max.apply(null, rows.map(function(x){return x.value}).concat([1]));
+  g("sipBars").innerHTML = rows.map(function(x){
+    var h = Math.max(2, x.value/maxV*100);
+    var invH = x.value>0 ? x.cumInv/x.value*100 : 100;
+    return '<div class="ybar" title="Year '+x.year+': '+fmtINRfull(x.value)+'"><div style="height:'+h+'%;display:flex;flex-direction:column;justify-content:flex-end"><div class="seg-gain" style="height:'+(100-invH)+'%"></div><div class="seg-inv" style="height:'+invH+'%"></div></div></div>';
+  }).join("");
+  g("sipBarLbls").innerHTML = rows.map(function(x){ return '<div style="flex:1;text-align:center" class="ybar-lbl">'+x.year+'</div>'; }).join("");
+
+  g("sipTbody").innerHTML = rows.map(function(x){
+    return '<tr><td data-l="Year"><b>Year '+x.year+'</b></td><td data-l="Monthly SIP" class="num">'+fmtINRfull(x.monthly)+'</td><td data-l="Invested in year" class="num">'+fmtINRfull(x.yearInv)+'</td><td data-l="Total invested" class="num">'+fmtINRfull(x.cumInv)+'</td><td data-l="Value at year-end" class="num"><b>'+fmtINRfull(x.value)+'</b></td><td data-l="Gains so far" class="num">'+fmtINRfull(x.gains)+'</td></tr>';
+  }).join("");
+}
+g("sipAmt").addEventListener("input", function(){ g("sipAmtNum").value = g("sipAmt").value; sipCalc(); });
+["sipRet","sipYrs","sipStep"].forEach(function(id){ g(id).addEventListener("input", sipCalc); g(id).addEventListener("change", sipCalc); });
+g("sipAmtNum").addEventListener("input", function(){ var v=+g("sipAmtNum").value||0; if(v>=500 && v<=200000) g("sipAmt").value=v; sipCalc(); });
+g("sipAmtNum").addEventListener("change", function(){ var v=+g("sipAmtNum").value||0; if(v>=500 && v<=200000) g("sipAmt").value=v; sipCalc(); });
+sipCalc();
+</script>
+</body>
+</html>
